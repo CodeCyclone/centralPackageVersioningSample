@@ -2,8 +2,10 @@
 # https://github.com/dotnet/core/tree/master/samples/dependadotnet
 version: 2
 updates:
+
   - package-ecosystem: "nuget"
-      directory: "/src/GrpcClient" #GrpcClient.csproj
-      schedule:
-        interval: "daily"
-      open-pull-requests-limit: 5
+    directory: "/src/GrpcClient" #GrpcClient.csproj
+    open-pull-requests-limit: 5
+    target-branch: "main"
+    schedule:
+      interval: "daily"
