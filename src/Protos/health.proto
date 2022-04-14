@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package health.v1;
+
+import "google/protobuf/wrappers.proto";
+
+service Health {
+  rpc CheckHealth (HealthCheckRequest) returns (HealthStatus);
+}
+
+message HealthCheckRequest {
+  bool check_database_status = 1;
+}
+
+message HealthStatus {
+  string version = 1;
+  google.protobuf.BoolValue database_healthy = 2;
+}

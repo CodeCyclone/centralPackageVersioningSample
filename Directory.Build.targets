@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <Sdk Name="Microsoft.Build.CentralPackageVersions" />
+
+    <!-- Ensure developers are using a minimun supported version of VS -->
+  <Target Name="ValidateMinimumMsBuildVersion"
+    BeforeTargets="Restore;$(BuildDependsOn);Build;$(RebuildDependsOn);Rebuild;$(CleanDependsOn);Clean"
+    Condition=" '$(DesignTimeBuild)' != 'true' ">
+    <Error Text="Building this repository requires a minimun Visual Studio version of $(MinimumMSBuildVersion)" Condition="$(MSBuildVersion) &lt; $(MinimumMSBuildVersion)" />
+  </Target>
+
+  <!-- Speed up incremental builds in VS and support interface-aware caching -->
+  <PropertyGroup>
+    <ProduceReferenceAssembly Condition="'$(MSBuildProjectExtension)' == '.csproj' And '$(UsingMicrosoftNoTargetsSdk)' != 'true' and '$(FakesGenerated)' != 'true'">true</ProduceReferenceAssembly>
+    <!-- Copied from Microsoft.CurrentVersion.targets, since the import order of Directory.Build.targets will cause TargetRefPath to evaluate to empty. -->
+    <TargetRefPath Condition="'$(TargetRefPath)' == '' and '$(ProduceReferenceAssembly)' == 'true'">$([MSBuild]::NormalizePath($(TargetDir), 'ref', $(TargetFileName)))</TargetRefPath>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildThisFileDirectory)build\ToolsPackage.targets" Condition="'$(IsTool)' == 'true'" />
+</Project>

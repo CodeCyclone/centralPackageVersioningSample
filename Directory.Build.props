@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  
+  <PropertyGroup>
+    <EnlistmentRoot>$(MSBuildThisFileDirectory.TrimEnd('\\'))</EnlistmentRoot>
+    <SrcRoot>$(EnlistmentRoot)\src</SrcRoot>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <GHAccount>CodeCyclone</GHAccount>
+    <GHRepo>centralPackageVersioningSample</GHRepo>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Nerdbank.GitVersioning" Condition="!Exists('packages.config')" />
+  </ItemGroup>
+
+  <PropertyGroup Label="Versioning">
+    <Version Condition="'$(Version)' == ''">1.0.0</Version>
+    <AssemblyVersion>$(Version)</AssemblyVersion>
+    <PackageVersion>$(Version)</PackageVersion>
+    <FileVersion>$(Version)</FileVersion>
+    <InformationalVersion>$(Version)</InformationalVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PowerShellExe Condition="'$(PowerShellExe)' == ''">$(WINDIR)\System32\WindowsPowerShell\v1.0\powershell.exe</PowerShellExe>
+    <PowerShellExe Condition="!Exists('$(PowerShellExe)')">$(ProgramFiles)\PowerShell\7\pwsh.exe</PowerShellExe>
+    <PowerShellCommonArgs>-NoLogo -NoProfile -NonInteractive -ExecutionPolicy Unrestricted</PowerShellCommonArgs>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <RestoreUseStaticGraphEvaluation>true</RestoreUseStaticGraphEvaluation>
+    <Authors>$(GHAccount)</Authors>
+    <PackageReleaseNotes>Initial Release</PackageReleaseNotes>
+    <Description>Contains $(AssemblyName)</Description>
+    <RepositoryUrl>https://github.com/$(GHAccount)/$(GHRepo).git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>$(RepositoryUrl)</PackageProjectUrl>
+    <Copyright>Copyright (c). All rights reserved.</Copyright>
+
+    <MinimumMSBuildVersion>16.8</MinimumMSBuildVersion>
+    <LangName Condition="'$(LangName)' == ''">en-US</LangName>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TreatWarningsAsErrors Condition="'$(TreatWarningsAsErrors)' == ''">true</TreatWarningsAsErrors>
+    <WarningLevel Condition="'$(WarningLevel)' == ''">4</WarningLevel>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(MSBuildProjectExtension)' == '.csproj'">
+    <Deterministic>true</Deterministic>
+    <StyleCopAnalyzersEnabled Condition="'$(StyleCopAnalyzersEnabled)' == ''">true</StyleCopAnalyzersEnabled>
+    <IncludeSymbols>true</IncludeSymbols>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <LangVersion>Latest</LangVersion>
+
+    <UseHostCompilerIfAvailable Condition="'$(BuildingForLiveUnitTesting)' == 'true'">true</UseHostCompilerIfAvailable>
+
+    <!-- Disable transitive project references to avoid excessive QuickBuild sandboxing in large repos -->
+    <DisableTransitiveProjectReferences>true</DisableTransitiveProjectReferences>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <BaseArtifactsPath>$(MSBuildThisFileDirectory)artifacts</BaseArtifactsPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <DefaultItemExcludes>$(DefaultItemExcludes);*.log</DefaultItemExcludes>
+  </PropertyGroup>
+
+  <!-- Standard Debug PropertyGroup from VS template -->
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineConstants>$(DefineConstants);DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+
+   <!-- Standard Release PropertyGroup from VS template -->
+  <PropertyGroup Condition=" '$(Configuration)' != 'Debug' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineConstants>$(DefineConstants);TRACE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageOutputPath>$(EnlistmentRoot)\pkgOut</PackageOutputPath>
+  </PropertyGroup>
+
+  <!--
+    SLNGEN Settings
+  -->
+  <PropertyGroup>
+    <SlnGenLaunchVisualStudio>true</SlnGenLaunchVisualStudio>
+    <SlnGenGlobalProperties>ExcludeRestorePackageImports=true;Platform=$(Platform)</SlnGenGlobalProperties>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <SlnGenSolutionItem Include="$(EnlistmentRoot)\Directory.Build.props" />
+    <SlnGenSolutionItem Include="$(EnlistmentRoot)\Directory.Build.targets" />
+    <SlnGenSolutionItem Include="$(EnlistmentRoot)\Packages.props" />
+  </ItemGroup>
+
+  <!--
+    Devs usually don't need to see/build non-code projects in VS, particularly since some of them don't build cleanly in the IDE.
+    Excluding the projects makes VS builds faster and keeps parity with VSMSBUILD experience
+  -->
+  <PropertyGroup Condition="'$(MSBuildProjectExtension)' == '.proj' Or '$(MSBuildProjectExtension)' == '.nuproj'">
+    <IncludeInSolutionFile>false</IncludeInSolutionFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SlnGen" />
+  </ItemGroup>
+
+</Project>
